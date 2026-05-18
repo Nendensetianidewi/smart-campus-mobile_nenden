@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus Mobile</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        /* Menghilangkan scrollbar di area konten utama agar mulus seperti aplikasi native */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { transition: background-color 0.3s, color 0.3s; }
+    </style>
+</head>
+<body class="bg-slate-900 flex justify-center items-center min-h-screen antialiased text-slate-900 selection:bg-blue-500 selection:text-white">
+
+    <div class="w-full max-w-md h-[92vh] bg-slate-50 shadow-2xl relative flex flex-col overflow-hidden sm:rounded-[36px] sm:border-[8px] sm:border-slate-800 dark:bg-slate-950 dark:text-slate-100">
+        
+        <div id="splash-screen" class="absolute inset-0 bg-linear-to-br from-blue-600 via-indigo-600 to-violet-700 z-50 flex flex-col items-center justify-center text-white space-y-4">
+            <div class="bg-white/10 p-6 rounded-full backdrop-blur-md animate-bounce shadow-2xl">
+                <i class="fa-solid fa-graduation-cap text-5xl"></i>
+            </div>
+            <h1 class="text-2xl font-black tracking-widest">SMART CAMPUS</h1>
+            <p class="text-blue-200 text-xs tracking-wide animate-pulse">Memuat Pengalaman Akademik...</p>
+        </div>
+
+        <div id="login-page" class="absolute inset-0 z-40 bg-white dark:bg-slate-950 flex flex-col justify-center px-8 py-6 overflow-y-auto no-scrollbar">
+            <div class="text-center mb-8">
+                <div class="inline-flex p-3.5 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-2xl mb-4">
+                    <i class="fa-solid fa-shield-halved text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-black tracking-tight text-slate-800 dark:text-white">Selamat Datang</h2>
+                <p class="text-slate-400 dark:text-slate-500 text-xs mt-1">Silakan masuk ke akun Smart Campus Anda</p>
+            </div>
+            
+            <form id="form-login" class="space-y-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">NIM / Username</label>
+                    <input type="text" id="login-username" placeholder="Masukkan nama atau NIM..." required class="w-full mt-1.5 p-3.5 rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-900 dark:border-slate-800 text-xs font-semibold focus:outline-hidden focus:ring-2 focus:ring-blue-500 text-slate-700 dark:text-slate-200">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Password</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required class="w-full mt-1.5 p-3.5 rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-900 dark:border-slate-800 text-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 text-slate-700 dark:text-slate-200">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/20 transform active:scale-98 transition text-xs mt-2">
+                    Masuk Sekarang
+                </button>
+            </form>
+        </div>
+
+        <div id="main-app" class="hidden flex-1 flex flex-col h-full overflow-hidden">
+            
+            <header class="px-5 py-4 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between shrink-0 z-30 shadow-xs">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-linear-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-md">
+                        NS
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-black" id="user-display-name">Nenden Setiani</h3>
+                        <span id="connection-status" class="text-[10px] font-semibold text-emerald-500 flex items-center"><i class="fa-solid fa-circle text-[5px] mr-1 animate-pulse"></i> Online</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <button id="btn-geolocation" class="p-2 text-slate-400 hover:text-blue-500 transition rounded-lg"><i class="fa-solid fa-location-dot text-sm"></i></button>
+                    <button id="btn-dark-mode" class="p-2 text-slate-400 hover:text-amber-500 transition rounded-lg"><i class="fa-solid fa-moon text-sm"></i></button>
+                </div>
+            </header>
+
+            <div id="toast" class="hidden absolute top-18 left-1/2 transform -translate-x-1/2 bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 px-4 py-2.5 rounded-xl text-xs font-bold shadow-xl z-50 flex items-center space-x-2 border border-white/10">
+                <i class="fa-solid fa-circle-info text-blue-500"></i>
+                <span id="toast-msg">Notifikasi</span>
+            </div>
+
+            <div id="skeleton-loader" class="hidden p-5 space-y-4 flex-1 overflow-y-auto no-scrollbar">
+                <div class="h-32 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse"></div>
+                <div class="h-20 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse"></div>
+                <div class="h-20 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse"></div>
+            </div>
+
+            <main id="spa-pages" class="flex-1 overflow-y-auto p-5 no-scrollbar bg-slate-50/60 dark:bg-slate-900/40 z-10">
+                
+                <section id="page-dashboard" class="spa-page space-y-4">
+                    <div class="bg-linear-to-br from-blue-600 via-indigo-600 to-blue-700 p-5 rounded-2xl text-white shadow-xl relative overflow-hidden">
+                        <div class="absolute -right-4 -bottom-4 text-white/10 text-8xl font-black"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <h4 class="text-sm font-black tracking-wide">Smart Campus Center</h4>
+                        <p class="text-[11px] text-blue-100 mt-1 font-light leading-relaxed">Kelola data perkuliahan, jadwal dinamis, serta progres misi tugas akademik Anda.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800/60 shadow-xs">
+                            <span class="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center"><i class="fa-solid fa-quote-left mr-1"></i> Motivasi</span>
+                            <p id="api-quote" class="text-[11px] italic mt-1.5 text-slate-600 dark:text-slate-300 font-medium leading-relaxed">"Loading quote..."</p>
+                        </div>
+                        <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800/60 shadow-xs">
+                            <span class="text-[9px] font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider flex items-center"><i class="fa-solid fa-cloud-sun mr-1"></i> Cuaca</span>
+                            <p id="api-weather" class="text-[11px] font-black mt-2 text-slate-700 dark:text-slate-200"><i class="fa-solid fa-temperature-three-quarters text-blue-500 mr-1"></i> Bandung, 26°C</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800/60 shadow-xs">
+                        <h5 class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Integrasi Sistem</h5>
+                        <div class="space-y-2 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-500 dark:text-slate-400">Database Lokal</span>
+                                <span class="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-md font-bold text-[9px]">IndexedDB Ready</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-500 dark:text-slate-400">PWA Base</span>
+                                <span class="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-md font-bold text-[9px]">Installable App</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="page-jadwal" class="spa-page hidden space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-sm font-black">Jadwal Kuliah Pintar</h4>
+                        <span class="text-[9px] bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 px-2.5 py-0.5 rounded-md font-bold">Semester Ini</span>
+                    </div>
+                    <div id="schedule-container" class="space-y-2.5"></div>
+                </section>
+
+                <section id="page-tugas" class="spa-page hidden space-y-4">
+                    <div class="flex justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800/60 shadow-xs">
+                        <div>
+                            <h4 class="text-xs font-black">Academic Mission</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Daftar beban tugas kuliah</p>
+                        </div>
+                        <div class="text-right">
+                            <span id="progress-text" class="text-xs font-black text-blue-600 dark:text-blue-400">0% Selesai</span>
+                            <div class="w-16 bg-slate-100 dark:bg-slate-800 h-1 rounded-full mt-1 overflow-hidden">
+                                <div id="progress-bar" class="bg-blue-600 dark:bg-blue-500 h-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="form-tugas" class="flex space-x-2">
+                        <input type="text" id="input-tugas" placeholder="Tulis tugas baru..." required class="flex-1 text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-xl text-xs font-bold transition"><i class="fa-solid fa-plus"></i></button>
+                    </form>
+
+                    <div id="task-list" class="space-y-2">
+                        </div>
+                </section>
+
+                <section id="page-notifikasi" class="spa-page hidden space-y-2.5">
+                    <h4 class="text-sm font-black mb-1">Pemberitahuan</h4>
+                    <div class="p-3.5 bg-blue-50/60 dark:bg-blue-950/40 rounded-xl border border-blue-100/60 dark:border-blue-900/40 flex space-x-3">
+                        <div class="text-blue-500 mt-0.5"><i class="fa-solid fa-circle-exclamation text-sm"></i></div>
+                        <div>
+                            <h5 class="text-xs font-black text-slate-800 dark:text-slate-200">UAS Pemrograman Web Mobile</h5>
+                            <p class="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5 leading-relaxed">Selesaikan tantangan koding Smart Campus Mobile ini hingga tuntas seluruh kriteria penilaian.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="page-profil" class="spa-page hidden space-y-3">
+                    <div class="text-center py-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800/60 p-4 shadow-xs">
+                        <div class="w-16 h-16 bg-linear-to-tr from-blue-600 to-indigo-600 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-black shadow-md">
+                            NS
+                        </div>
+                        <h4 class="text-sm font-black mt-2">Nenden Setiani</h4>
+                        <p class="text-[10px] text-slate-400">Mahasiswa Sistem Informasi</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800/60 space-y-2.5 shadow-xs">
+                        <h5 class="text-[10px] font-bold uppercase tracking-widest text-blue-500">Showcase Developer Link</h5>
+                        
+                        <a href="https://nendensetiani.vercel.app/" target="_blank" class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/60 rounded-xl text-xs font-bold transition">
+                            <span class="flex items-center"><i class="fa-solid fa-address-card mr-2.5 text-blue-500 text-sm"></i> Beranda CV Online</span>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                        </a>
+                        <a href="https://github.com/" target="_blank" class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/60 rounded-xl text-xs font-bold transition">
+                            <span class="flex items-center"><i class="fa-brands fa-github mr-2.5 text-slate-800 dark:text-white text-base"></i> Akun GitHub</span>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                        </a>
+                    </div>
+                </section>
+
+            </main>
+
+            <nav class="bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800/80 h-16 flex items-center justify-around shrink-0 px-2 z-30 shadow-md">
+                <button data-target="page-dashboard" class="nav-btn flex flex-col items-center justify-center flex-1 h-full text-blue-600 font-bold transition">
+                    <i class="fa-solid fa-house-chimney text-base"></i>
+                    <span class="text-[9px] mt-1 tracking-wider">Dashboard</span>
+                </button>
+                <button data-target="page-jadwal" class="nav-btn flex flex-col items-center justify-center flex-1 h-full text-slate-400 hover:text-blue-500 transition">
+                    <i class="fa-solid fa-calendar-days text-base"></i>
+                    <span class="text-[9px] mt-1 tracking-wider">Jadwal</span>
+                </button>
+                <button data-target="page-tugas" class="nav-btn flex flex-col items-center justify-center flex-1 h-full text-slate-400 hover:text-blue-500 transition">
+                    <i class="fa-solid fa-circle-check text-base"></i>
+                    <span class="text-[9px] mt-1 tracking-wider">Tugas</span>
+                </button>
+                <button data-target="page-notifikasi" class="nav-btn flex flex-col items-center justify-center flex-1 h-full text-slate-400 hover:text-blue-500 transition relative">
+                    <i class="fa-solid fa-bell text-base"></i>
+                    <span class="text-[9px] mt-1 tracking-wider">Notifikasi</span>
+                    <span class="absolute top-3 right-6 w-1 h-1 bg-red-500 rounded-full"></span>
+                </button>
+                <button data-target="page-profil" class="nav-btn flex flex-col items-center justify-center flex-1 h-full text-slate-400 hover:text-blue-500 transition">
+                    <i class="fa-solid fa-user-gear text-base"></i>
+                    <span class="text-[9px] mt-1 tracking-wider">Profil</span>
+                </button>
+            </nav>
+
+        </div>
+    </div>
+
+    <script>
+        // DATA OBJECT JSON (Level 5) [cite: 64]
+        const dataMataKuliah = [
+            { matkul: "Pemrograman Web Mobile", jam: "08:00 - 10:30", ruangan: "Lab Komputer 3", hariIni: true },
+            { matkul: "Analisis & Perancangan Sistem", jam: "11:00 - 13:30", ruangan: "Ruang R.402", hariIni: false },
+            { matkul: "Manajemen Basis Data", jam: "14:00 - 16:30", ruangan: "Lab Komputer 1", hariIni: false }
+        ];
+
+        $(document).ready(function() {
+            
+            // --- LEVEL 3: MANAGEMENT SPLASH SCREEN ---
+            setTimeout(function() {
+                $('#splash-screen').fadeOut('slow'); 
+            }, 2500);
+
+            // --- LEVEL 3: LOGIKA LOGIN SANGAT BEBAS AKSES ---
+            $('#form-login').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Siapa pun bebas memasukkan nama/NIM tanpa terkunci
+                const userIn = $('#login-username').val().trim();
+
+                // Efek transisi menyembunyikan form login & membuka core dashboard
+                $('#login-page').fadeOut('medium', function() {
+                    $('#main-app').removeClass('hidden'); 
+                    
+                    // Notifikasi sukses menyambut nama yang diinput
+                    showToast(`Selamat Datang, ${userIn}!`);
+                    
+                    fetchQuoteAPI();
+                    renderScheduleGrid();
+                    initMissionsIndexedDB(); 
+                });
+            });
+
+            // --- LEVEL 4: SPA NAVIGATION SYSTEM ---
+            $('.nav-btn').on('click', function() {
+                const targetPage = $(this).data('target');
+                
+                // Memicu efek Skeleton Loading (Level 8) saat berpindah menu [cite: 98]
+                $('#spa-pages').addClass('hidden');
+                $('#skeleton-loader').removeClass('hidden');
+
+                $('.nav-btn').removeClass('text-blue-600 font-bold').addClass('text-slate-400');
+                $(this).addClass('text-blue-600 font-bold').removeClass('text-slate-400');
+
+                setTimeout(function() {
+                    $('#skeleton-loader').addClass('hidden');
+                    $('#spa-pages').removeClass('hidden');
+                    
+                    $('.spa-page').addClass('hidden');
+                    $('#' + targetPage).removeClass('hidden');
+                }, 400); 
+            });
+
+            // --- LEVEL 5: SCHEDULE SYSTEM GRID DATA [cite: 56]
+            function renderScheduleGrid() {
+                let html = '';
+                dataMataKuliah.forEach(item => {
+                    const lineStyle = item.hariIni ? 'border-l-4 border-blue-600 bg-blue-50/40 dark:bg-blue-950/20' : 'bg-white dark:bg-slate-900';
+                    html += `
+                        <div class="p-4 rounded-xl border border-slate-100 dark:border-slate-800/60 shadow-xs ${lineStyle}">
+                            <div class="flex justify-between items-start">
+                                <h5 class="text-xs font-black text-slate-800 dark:text-slate-200">${item.matkul}</h5>
+                                ${item.hariIni ? '<span class="text-[8px] bg-emerald-500 text-white px-1.5 py-0.5 rounded font-black uppercase tracking-wide">Now</span>' : ''}
+                            </div>
+                            <div class="flex space-x-4 text-[11px] text-slate-400 mt-2.5">
+                                <span><i class="fa-regular fa-clock mr-1 text-blue-500"></i> ${item.jam}</span>
+                                <span><i class="fa-solid fa-location-dot mr-1 text-rose-500"></i> ${item.ruangan}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                $('#schedule-container').html(html);
+            }
+
+            // --- LEVEL 7: ASYNCHRONOUS DATA CALL AJAX [cite: 82, 90] ---
+            function fetchQuoteAPI() {
+                $.ajax({
+                    url: 'https://dummyjson.com/quotes/random',
+                    method: 'GET',
+                    success: function(res) {
+                        $('#api-quote').text(`"${res.quote}" — ${res.author}`);
+                    },
+                    error: function() {
+                        $('#api-quote').text('"Tetap produktif dan semangat membangun portofolio koding terbaik!"');
+                    }
+                });
+            }
+
+            // --- LEVEL 8: TOAST NOTIFICATION UTILITY [cite: 99] ---
+            function showToast(text) {
+                $('#toast-msg').text(text);
+                $('#toast').fadeIn().css('display', 'flex');
+                setTimeout(function() { $('#toast').fadeOut(); }, 3000);
+            }
+
+            // --- LEVEL 8: DARK MODE CONTROLLER [cite: 97] ---
+            $('#btn-dark-mode').on('click', function() {
+                $('html').toggleClass('dark');
+                const isDark = $('html').hasClass('dark');
+                $(this).html(isDark ? '<i class="fa-solid fa-sun text-sm"></i>' : '<i class="fa-solid fa-moon text-sm"></i>');
+                showToast(isDark ? "Mode gelap aktif" : "Mode terang aktif");
+            });
+
+            // --- LEVEL 10: GEOLOCATION API HARDWARE [cite: 130] ---
+            $('#btn-geolocation').on('click', function() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(pos) {
+                        showToast(`Lokasi Terkunci: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`);
+                    }, function() {
+                        showToast("Izin lokasi ditolak.");
+                    });
+                } else {
+                    showToast("Browser Anda tidak mendukung lokasi.");
+                }
+            });
+
+            // ==========================================
+            // LEVEL 6 & 10: INTERNAL STORAGE ENGINE INDEXEDDB [cite: 78, 125]
+            // ==========================================
+            let localDb;
+            function initMissionsIndexedDB() {
+                const request = indexedDB.open("SmartCampusDB", 1);
+                
+                request.onupgradeneeded = function(e) {
+                    localDb = e.target.result;
+                    localDb.createObjectStore("missions", { keyPath: "id", autoIncrement: true });
+                };
+
+                request.onsuccess = function(e) {
+                    localDb = e.target.result;
+                    fetchSavedMissions();
+                };
+            }
+
+            function fetchSavedMissions() {
+                const trans = localDb.transaction(["missions"], "readonly");
+                const store = trans.objectStore("missions");
+                const req = store.getAll();
+
+                req.onsuccess = function() {
+                    const tasks = req.result;
+                    if (tasks.length === 0) {
+                        const initialData = [
+                            { text: "Pelajari kerangka SPA modular", done: true },
+                            { text: "Koneksikan database lokal dengan UI", done: false }
+                        ];
+                        const writeTrans = localDb.transaction(["missions"], "readwrite");
+                        const writeStore = writeTrans.objectStore("missions");
+                        initialData.forEach(task => writeStore.add(task));
+                        fetchSavedMissions();
+                        return;
+                    }
+                    renderMissionsView(tasks);
+                };
+            }
+
+            function renderMissionsView(tasks) {
+                let listHtml = '';
+                let successTotal = 0;
+
+                tasks.forEach(item => {
+                    if (item.done) successTotal++;
+                    const isChecked = item.done ? 'checked' : '';
+                    const strike = item.done ? 'line-through text-slate-400 font-normal' : 'font-semibold text-slate-700 dark:text-slate-200';
+
+                    listHtml += `
+                        <div class="flex items-center justify-between p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800/60 shadow-xs">
+                            <div class="flex items-center space-x-3">
+                                <input type="checkbox" data-id="${item.id}" ${isChecked} class="item-checkbox h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                                <span class="text-xs ${strike}">${item.text}</span>
+                            </div>
+                            ${item.done ? '<span class="text-[8px] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded font-bold uppercase">Done</span>' : '<span class="text-[8px] bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded font-bold uppercase">Misi</span>'}
+                        </div>
+                    `;
+                });
+
+                $('#task-list').html(listHtml);
+
+                const scorePercentage = tasks.length > 0 ? Math.round((successTotal / tasks.length) * 100) : 0;
+                $('#progress-text').text(`${scorePercentage}% Selesai`);
+                $('#progress-bar').css('width', `${scorePercentage}%`);
+            }
+
+            $('#form-tugas').on('submit', function(e) {
+                e.preventDefault();
+                const textVal = $('#input-tugas').val();
+                
+                const trans = localDb.transaction(["missions"], "readwrite");
+                const store = trans.objectStore("missions");
+                store.add({ text: textVal, done: false });
+
+                trans.oncomplete = function() {
+                    $('#input-tugas').val('');
+                    fetchSavedMissions();
+                    showToast("Misi tugas baru disimpan!");
+                };
+            });
+
+            $(document).on('change', '.item-checkbox', function() {
+                const targetId = parseInt($(this).data('id'));
+                const state = $(this).is(':checked');
+
+                const trans = localDb.transaction(["missions"], "readwrite");
+                const store = trans.objectStore("missions");
+                
+                store.get(targetId).onsuccess = function(e) {
+                    const data = e.target.result;
+                    data.done = state;
+                    store.put(data);
+                };
+
+                trans.oncomplete = function() {
+                    fetchSavedMissions();
+                    showToast(state ? "Tugas diselesaikan!" : "Tugas dibuka kembali.");
+                };
+            });
+        });
+
+        // --- LEVEL 9: PWA SERVICE WORKER REGISTRATION [cite: 110] ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(e => console.error(e));
+            });
+        }
+    </script>
+</body>
+</html>
