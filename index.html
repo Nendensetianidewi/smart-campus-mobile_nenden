@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Campus Mobile</title>
+    <!-- Tailwind CSS v4 -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <link rel="manifest" href="manifest.json">
     <style>
-        /* Menghilangkan scrollbar di area konten utama agar mulus seperti aplikasi native */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         body { transition: background-color 0.3s, color 0.3s; }
@@ -19,6 +19,7 @@
 
     <div class="w-full max-w-md h-[92vh] bg-slate-50 shadow-2xl relative flex flex-col overflow-hidden sm:rounded-[36px] sm:border-[8px] sm:border-slate-800 dark:bg-slate-950 dark:text-slate-100">
         
+        <!-- --- SPLASH SCREEN --- -->
         <div id="splash-screen" class="absolute inset-0 bg-linear-to-br from-blue-600 via-indigo-600 to-violet-700 z-50 flex flex-col items-center justify-center text-white space-y-4">
             <div class="bg-white/10 p-6 rounded-full backdrop-blur-md animate-bounce shadow-2xl">
                 <i class="fa-solid fa-graduation-cap text-5xl"></i>
@@ -27,6 +28,7 @@
             <p class="text-blue-200 text-xs tracking-wide animate-pulse">Memuat Pengalaman Academic...</p>
         </div>
 
+        <!-- --- LOGIN PAGE --- -->
         <div id="login-page" class="absolute inset-0 z-40 bg-white dark:bg-slate-950 flex flex-col justify-center px-8 py-6 overflow-y-auto no-scrollbar">
             <div class="text-center mb-8">
                 <div class="inline-flex p-3.5 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-2xl mb-4">
@@ -51,8 +53,10 @@
             </form>
         </div>
 
+        <!-- --- MAIN APP CONTAINER --- -->
         <div id="main-app" class="hidden flex-1 flex flex-col h-full overflow-hidden">
             
+            <!-- HEADER -->
             <header class="px-5 py-4 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between shrink-0 z-30 shadow-xs">
                 <div class="flex items-center space-x-3">
                     <div id="user-avatar" class="w-9 h-9 rounded-xl bg-linear-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-md">
@@ -69,19 +73,23 @@
                 </div>
             </header>
 
+            <!-- TOAST NOTIFICATION -->
             <div id="toast" class="hidden absolute top-18 left-1/2 transform -translate-x-1/2 bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 px-4 py-2.5 rounded-xl text-xs font-bold shadow-xl z-50 flex items-center space-x-2 border border-white/10">
                 <i class="fa-solid fa-circle-info text-blue-500"></i>
                 <span id="toast-msg">Notifikasi</span>
             </div>
 
+            <!-- SKELETON LOADER -->
             <div id="skeleton-loader" class="hidden p-5 space-y-4 flex-1 overflow-y-auto no-scrollbar">
                 <div class="h-32 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse"></div>
                 <div class="h-20 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse"></div>
                 <div class="h-20 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse"></div>
             </div>
 
+            <!-- SPA CONTENT APP -->
             <main id="spa-pages" class="flex-1 overflow-y-auto p-5 no-scrollbar bg-slate-50/60 dark:bg-slate-900/40 z-10">
                 
+                <!-- DASHBOARD PAGE -->
                 <section id="page-dashboard" class="spa-page space-y-4">
                     <div class="bg-linear-to-br from-blue-600 via-indigo-600 to-blue-700 p-5 rounded-2xl text-white shadow-xl relative overflow-hidden">
                         <div class="absolute -right-4 -bottom-4 text-white/10 text-8xl font-black"><i class="fa-solid fa-graduation-cap"></i></div>
@@ -115,6 +123,7 @@
                     </div>
                 </section>
 
+                <!-- JADWAL PAGE -->
                 <section id="page-jadwal" class="spa-page hidden space-y-3">
                     <div class="flex items-center justify-between">
                         <h4 class="text-sm font-black">Jadwal Kuliah Pintar</h4>
@@ -123,6 +132,7 @@
                     <div id="schedule-container" class="space-y-2.5"></div>
                 </section>
 
+                <!-- TUGAS / MISSION PAGE -->
                 <section id="page-tugas" class="spa-page hidden space-y-4">
                     <div class="flex justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800/60 shadow-xs">
                         <div>
@@ -145,6 +155,7 @@
                     <div id="task-list" class="space-y-2"></div>
                 </section>
 
+                <!-- NOTIFIKASI PAGE -->
                 <section id="page-notifikasi" class="spa-page hidden space-y-2.5">
                     <h4 class="text-sm font-black mb-1">Pemberitahuan</h4>
                     <div class="p-3.5 bg-blue-50/60 dark:bg-blue-950/40 rounded-xl border border-blue-100/60 dark:border-blue-900/40 flex space-x-3">
@@ -156,6 +167,7 @@
                     </div>
                 </section>
 
+                <!-- PROFIL PAGE -->
                 <section id="page-profil" class="spa-page hidden space-y-3">
                     <div class="text-center py-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800/60 p-4 shadow-xs">
                         <div id="profile-avatar" class="w-16 h-16 bg-linear-to-tr from-blue-600 to-indigo-600 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-black shadow-md">
@@ -172,6 +184,13 @@
                             <span class="flex items-center"><i class="fa-solid fa-address-card mr-2.5 text-blue-500 text-sm"></i> Beranda CV Online</span>
                             <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
                         </a>
+
+                        <!-- TOMBOL YOUTUBE DEMO BARU -->
+                        <a href="https://youtube.com/shorts/cNU58KOsngY?si=FLjd1cIs9I7cLfFC" target="_blank" class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 hover:bg-rose-100 dark:hover:bg-rose-950/30 rounded-xl text-xs font-bold transition">
+                            <span class="flex items-center"><i class="fa-brands fa-youtube mr-2.5 text-red-600 text-sm"></i> Video Demo Aplikasi</span>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                        </a>
+
                         <a href="https://github.com/" target="_blank" class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/60 rounded-xl text-xs font-bold transition">
                             <span class="flex items-center"><i class="fa-brands fa-github mr-2.5 text-slate-800 dark:text-white text-base"></i> Akun GitHub</span>
                             <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
@@ -181,6 +200,7 @@
 
             </main>
 
+            <!-- TAIL NAVIGATION BAR -->
             <nav class="bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800/80 h-16 flex items-center justify-around shrink-0 px-2 z-30 shadow-md">
                 <button data-target="page-dashboard" class="nav-btn flex flex-col items-center justify-center flex-1 h-full text-blue-600 font-bold transition">
                     <i class="fa-solid fa-house-chimney text-base"></i>
@@ -209,7 +229,6 @@
     </div>
 
     <script>
-        // DATA OBJECT JSON
         const dataMataKuliah = [
             { matkul: "Pemrograman Web Mobile", jam: "08:00 - 10:30", ruangan: "Lab Komputer 3", hariIni: true },
             { matkul: "Analisis & Perancangan Sistem", jam: "11:00 - 13:30", ruangan: "Ruang R.402", hariIni: false },
@@ -218,20 +237,16 @@
 
         $(document).ready(function() {
             
-            // --- SPLASH SCREEN MANAGEMENT ---
             setTimeout(function() {
                 $('#splash-screen').fadeOut('slow'); 
             }, 2500);
 
-            // --- USERNAME DYNAMIC LOGIC ---
             function updateDynamicUser(nameInput) {
                 const cleanedName = nameInput.trim();
                 if (!cleanedName) return;
 
-                // Update teks nama di seluruh aplikasi yang memiliki class target
                 $('.global-username-display').text(cleanedName);
 
-                // Membuat inisial nama (Contoh: "Nenden Setiani" -> "NS", "Budi" -> "BU")
                 const words = cleanedName.split(' ');
                 let initials = '';
                 if (words.length >= 2) {
@@ -241,36 +256,25 @@
                 }
                 initials = initials.toUpperCase();
 
-                // Inject inisial ke avatar header dan halaman profil
                 $('#user-avatar, #profile-avatar').text(initials);
             }
 
-            // --- LOGIN PROCESS ---
             $('#form-login').on('submit', function(e) {
                 e.preventDefault();
-                
                 const userIn = $('#login-username').val();
-
-                // Proses pembaruan nama profil & inisial secara dinamis
                 updateDynamicUser(userIn);
 
-                // Efek transisi menyembunyikan form login & membuka core dashboard
                 $('#login-page').fadeOut('medium', function() {
                     $('#main-app').removeClass('hidden'); 
-                    
                     showToast(`Selamat Datang, ${userIn.trim()}!`);
-                    
                     fetchQuoteAPI();
                     renderScheduleGrid();
                     initMissionsIndexedDB(); 
                 });
             });
 
-            // --- SPA NAVIGATION SYSTEM ---
             $('.nav-btn').on('click', function() {
                 const targetPage = $(this).data('target');
-                
-                // Memicu efek Skeleton Loading saat berpindah menu
                 $('#spa-pages').addClass('hidden');
                 $('#skeleton-loader').removeClass('hidden');
 
@@ -280,13 +284,11 @@
                 setTimeout(function() {
                     $('#skeleton-loader').addClass('hidden');
                     $('#spa-pages').removeClass('hidden');
-                    
                     $('.spa-page').addClass('hidden');
                     $('#' + targetPage).removeClass('hidden');
                 }, 400); 
             });
 
-            // --- SCHEDULE SYSTEM GRID DATA ---
             function renderScheduleGrid() {
                 let html = '';
                 dataMataKuliah.forEach(item => {
@@ -307,7 +309,6 @@
                 $('#schedule-container').html(html);
             }
 
-            // --- ASYNCHRONOUS DATA CALL AJAX ---
             function fetchQuoteAPI() {
                 $.ajax({
                     url: 'https://dummyjson.com/quotes/random',
@@ -321,14 +322,12 @@
                 });
             }
 
-            // --- TOAST NOTIFICATION UTILITY ---
             function showToast(text) {
                 $('#toast-msg').text(text);
                 $('#toast').fadeIn().css('display', 'flex');
                 setTimeout(function() { $('#toast').fadeOut(); }, 3000);
             }
 
-            // --- DARK MODE CONTROLLER ---
             $('#btn-dark-mode').on('click', function() {
                 $('html').toggleClass('dark');
                 const isDark = $('html').hasClass('dark');
@@ -336,7 +335,6 @@
                 showToast(isDark ? "Mode gelap aktif" : "Mode terang aktif");
             });
 
-            // --- GEOLOCATION API HARDWARE ---
             $('#btn-geolocation').on('click', function() {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(function(pos) {
@@ -349,18 +347,13 @@
                 }
             });
 
-            // ==========================================
-            // INTERNAL STORAGE ENGINE INDEXEDDB (CRUD Misi)
-            // ==========================================
             let localDb;
             function initMissionsIndexedDB() {
                 const request = indexedDB.open("SmartCampusDB", 1);
-                
                 request.onupgradeneeded = function(e) {
                     localDb = e.target.result;
                     localDb.createObjectStore("missions", { keyPath: "id", autoIncrement: true });
                 };
-
                 request.onsuccess = function(e) {
                     localDb = e.target.result;
                     fetchSavedMissions();
@@ -415,13 +408,11 @@
                 });
 
                 $('#task-list').html(listHtml);
-
                 const scorePercentage = tasks.length > 0 ? Math.round((successTotal / tasks.length) * 100) : 0;
                 $('#progress-text').text(`${scorePercentage}% Selesai`);
                 $('#progress-bar').css('width', `${scorePercentage}%`);
             }
 
-            // Tambah Tugas Baru
             $('#form-tugas').on('submit', function(e) {
                 e.preventDefault();
                 const textVal = $('#input-tugas').val().trim();
@@ -438,11 +429,9 @@
                 };
             });
 
-            // Update Status Tugas (Check/Uncheck)
             $(document).on('change', '.item-checkbox', function() {
                 const targetId = parseInt($(this).data('id'));
                 const state = $(this).is(':checked');
-
                 const trans = localDb.transaction(["missions"], "readwrite");
                 const store = trans.objectStore("missions");
                 
@@ -453,17 +442,14 @@
                         store.put(data);
                     }
                 };
-
                 trans.oncomplete = function() {
                     fetchSavedMissions();
                     showToast(state ? "Tugas diselesaikan!" : "Tugas dibuka kembali.");
                 };
             });
 
-            // Hapus Tugas Dari IndexedDB
             $(document).on('click', '.btn-delete-task', function() {
                 const targetId = parseInt($(this).data('id'));
-
                 const trans = localDb.transaction(["missions"], "readwrite");
                 const store = trans.objectStore("missions");
                 store.delete(targetId);
@@ -475,7 +461,6 @@
             });
         });
 
-        // --- PWA SERVICE WORKER REGISTRATION ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js').catch(e => console.error(e));
