@@ -24,7 +24,7 @@
                 <i class="fa-solid fa-graduation-cap text-5xl"></i>
             </div>
             <h1 class="text-2xl font-black tracking-widest">SMART CAMPUS</h1>
-            <p class="text-blue-200 text-xs tracking-wide animate-pulse">Memuat Pengalaman Akademik...</p>
+            <p class="text-blue-200 text-xs tracking-wide animate-pulse">Memuat Pengalaman Academic...</p>
         </div>
 
         <div id="login-page" class="absolute inset-0 z-40 bg-white dark:bg-slate-950 flex flex-col justify-center px-8 py-6 overflow-y-auto no-scrollbar">
@@ -55,11 +55,11 @@
             
             <header class="px-5 py-4 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between shrink-0 z-30 shadow-xs">
                 <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-linear-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-md">
+                    <div id="user-avatar" class="w-9 h-9 rounded-xl bg-linear-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-md">
                         NS
                     </div>
                     <div>
-                        <h3 class="text-xs font-black" id="user-display-name">Nenden Setiani</h3>
+                        <h3 class="text-xs font-black global-username-display">Nenden Setiani</h3>
                         <span id="connection-status" class="text-[10px] font-semibold text-emerald-500 flex items-center"><i class="fa-solid fa-circle text-[5px] mr-1 animate-pulse"></i> Online</span>
                     </div>
                 </div>
@@ -142,8 +142,7 @@
                         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-xl text-xs font-bold transition"><i class="fa-solid fa-plus"></i></button>
                     </form>
 
-                    <div id="task-list" class="space-y-2">
-                        </div>
+                    <div id="task-list" class="space-y-2"></div>
                 </section>
 
                 <section id="page-notifikasi" class="spa-page hidden space-y-2.5">
@@ -159,10 +158,10 @@
 
                 <section id="page-profil" class="spa-page hidden space-y-3">
                     <div class="text-center py-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800/60 p-4 shadow-xs">
-                        <div class="w-16 h-16 bg-linear-to-tr from-blue-600 to-indigo-600 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-black shadow-md">
+                        <div id="profile-avatar" class="w-16 h-16 bg-linear-to-tr from-blue-600 to-indigo-600 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-black shadow-md">
                             NS
                         </div>
-                        <h4 class="text-sm font-black mt-2">Nenden Setiani</h4>
+                        <h4 class="text-sm font-black mt-2 global-username-display">Nenden Setiani</h4>
                         <p class="text-[10px] text-slate-400">Mahasiswa Sistem Informasi</p>
                     </div>
 
@@ -210,7 +209,7 @@
     </div>
 
     <script>
-        // DATA OBJECT JSON (Level 5) [cite: 64]
+        // DATA OBJECT JSON
         const dataMataKuliah = [
             { matkul: "Pemrograman Web Mobile", jam: "08:00 - 10:30", ruangan: "Lab Komputer 3", hariIni: true },
             { matkul: "Analisis & Perancangan Sistem", jam: "11:00 - 13:30", ruangan: "Ruang R.402", hariIni: false },
@@ -219,24 +218,47 @@
 
         $(document).ready(function() {
             
-            // --- LEVEL 3: MANAGEMENT SPLASH SCREEN ---
+            // --- SPLASH SCREEN MANAGEMENT ---
             setTimeout(function() {
                 $('#splash-screen').fadeOut('slow'); 
             }, 2500);
 
-            // --- LEVEL 3: LOGIKA LOGIN SANGAT BEBAS AKSES ---
+            // --- USERNAME DYNAMIC LOGIC ---
+            function updateDynamicUser(nameInput) {
+                const cleanedName = nameInput.trim();
+                if (!cleanedName) return;
+
+                // Update teks nama di seluruh aplikasi yang memiliki class target
+                $('.global-username-display').text(cleanedName);
+
+                // Membuat inisial nama (Contoh: "Nenden Setiani" -> "NS", "Budi" -> "BU")
+                const words = cleanedName.split(' ');
+                let initials = '';
+                if (words.length >= 2) {
+                    initials = words[0].charAt(0) + words[1].charAt(0);
+                } else if (words.length === 1) {
+                    initials = words[0].substring(0, 2);
+                }
+                initials = initials.toUpperCase();
+
+                // Inject inisial ke avatar header dan halaman profil
+                $('#user-avatar, #profile-avatar').text(initials);
+            }
+
+            // --- LOGIN PROCESS ---
             $('#form-login').on('submit', function(e) {
                 e.preventDefault();
                 
-                // Siapa pun bebas memasukkan nama/NIM tanpa terkunci
-                const userIn = $('#login-username').val().trim();
+                const userIn = $('#login-username').val();
+
+                // Proses pembaruan nama profil & inisial secara dinamis
+                updateDynamicUser(userIn);
 
                 // Efek transisi menyembunyikan form login & membuka core dashboard
                 $('#login-page').fadeOut('medium', function() {
                     $('#main-app').removeClass('hidden'); 
                     
-                    // Notifikasi sukses menyambut nama yang diinput
-                    showToast(`Selamat Datang, ${userIn}!`);
+                    showToast(`Selamat Datang, ${userIn.trim()}!`);
                     
                     fetchQuoteAPI();
                     renderScheduleGrid();
@@ -244,11 +266,11 @@
                 });
             });
 
-            // --- LEVEL 4: SPA NAVIGATION SYSTEM ---
+            // --- SPA NAVIGATION SYSTEM ---
             $('.nav-btn').on('click', function() {
                 const targetPage = $(this).data('target');
                 
-                // Memicu efek Skeleton Loading (Level 8) saat berpindah menu [cite: 98]
+                // Memicu efek Skeleton Loading saat berpindah menu
                 $('#spa-pages').addClass('hidden');
                 $('#skeleton-loader').removeClass('hidden');
 
@@ -264,7 +286,7 @@
                 }, 400); 
             });
 
-            // --- LEVEL 5: SCHEDULE SYSTEM GRID DATA [cite: 56]
+            // --- SCHEDULE SYSTEM GRID DATA ---
             function renderScheduleGrid() {
                 let html = '';
                 dataMataKuliah.forEach(item => {
@@ -285,7 +307,7 @@
                 $('#schedule-container').html(html);
             }
 
-            // --- LEVEL 7: ASYNCHRONOUS DATA CALL AJAX [cite: 82, 90] ---
+            // --- ASYNCHRONOUS DATA CALL AJAX ---
             function fetchQuoteAPI() {
                 $.ajax({
                     url: 'https://dummyjson.com/quotes/random',
@@ -299,14 +321,14 @@
                 });
             }
 
-            // --- LEVEL 8: TOAST NOTIFICATION UTILITY [cite: 99] ---
+            // --- TOAST NOTIFICATION UTILITY ---
             function showToast(text) {
                 $('#toast-msg').text(text);
                 $('#toast').fadeIn().css('display', 'flex');
                 setTimeout(function() { $('#toast').fadeOut(); }, 3000);
             }
 
-            // --- LEVEL 8: DARK MODE CONTROLLER [cite: 97] ---
+            // --- DARK MODE CONTROLLER ---
             $('#btn-dark-mode').on('click', function() {
                 $('html').toggleClass('dark');
                 const isDark = $('html').hasClass('dark');
@@ -314,7 +336,7 @@
                 showToast(isDark ? "Mode gelap aktif" : "Mode terang aktif");
             });
 
-            // --- LEVEL 10: GEOLOCATION API HARDWARE [cite: 130] ---
+            // --- GEOLOCATION API HARDWARE ---
             $('#btn-geolocation').on('click', function() {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(function(pos) {
@@ -328,7 +350,7 @@
             });
 
             // ==========================================
-            // LEVEL 6 & 10: INTERNAL STORAGE ENGINE INDEXEDDB [cite: 78, 125]
+            // INTERNAL STORAGE ENGINE INDEXEDDB (CRUD Misi)
             // ==========================================
             let localDb;
             function initMissionsIndexedDB() {
@@ -377,12 +399,17 @@
                     const strike = item.done ? 'line-through text-slate-400 font-normal' : 'font-semibold text-slate-700 dark:text-slate-200';
 
                     listHtml += `
-                        <div class="flex items-center justify-between p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800/60 shadow-xs">
-                            <div class="flex items-center space-x-3">
-                                <input type="checkbox" data-id="${item.id}" ${isChecked} class="item-checkbox h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
-                                <span class="text-xs ${strike}">${item.text}</span>
+                        <div class="flex items-center justify-between p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800/60 shadow-xs group/item">
+                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                <input type="checkbox" data-id="${item.id}" ${isChecked} class="item-checkbox h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 shrink-0">
+                                <span class="text-xs truncate ${strike}">${item.text}</span>
                             </div>
-                            ${item.done ? '<span class="text-[8px] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded font-bold uppercase">Done</span>' : '<span class="text-[8px] bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded font-bold uppercase">Misi</span>'}
+                            <div class="flex items-center space-x-2 shrink-0 ml-2">
+                                ${item.done ? '<span class="text-[8px] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded font-bold uppercase">Done</span>' : '<span class="text-[8px] bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded font-bold uppercase">Misi</span>'}
+                                <button data-id="${item.id}" class="btn-delete-task p-1 text-slate-300 hover:text-rose-500 rounded transition duration-200" title="Hapus Tugas">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                            </div>
                         </div>
                     `;
                 });
@@ -394,9 +421,11 @@
                 $('#progress-bar').css('width', `${scorePercentage}%`);
             }
 
+            // Tambah Tugas Baru
             $('#form-tugas').on('submit', function(e) {
                 e.preventDefault();
-                const textVal = $('#input-tugas').val();
+                const textVal = $('#input-tugas').val().trim();
+                if(!textVal) return;
                 
                 const trans = localDb.transaction(["missions"], "readwrite");
                 const store = trans.objectStore("missions");
@@ -409,6 +438,7 @@
                 };
             });
 
+            // Update Status Tugas (Check/Uncheck)
             $(document).on('change', '.item-checkbox', function() {
                 const targetId = parseInt($(this).data('id'));
                 const state = $(this).is(':checked');
@@ -418,8 +448,10 @@
                 
                 store.get(targetId).onsuccess = function(e) {
                     const data = e.target.result;
-                    data.done = state;
-                    store.put(data);
+                    if(data) {
+                        data.done = state;
+                        store.put(data);
+                    }
                 };
 
                 trans.oncomplete = function() {
@@ -427,9 +459,23 @@
                     showToast(state ? "Tugas diselesaikan!" : "Tugas dibuka kembali.");
                 };
             });
+
+            // Hapus Tugas Dari IndexedDB
+            $(document).on('click', '.btn-delete-task', function() {
+                const targetId = parseInt($(this).data('id'));
+
+                const trans = localDb.transaction(["missions"], "readwrite");
+                const store = trans.objectStore("missions");
+                store.delete(targetId);
+
+                trans.oncomplete = function() {
+                    fetchSavedMissions();
+                    showToast("Misi tugas berhasil dihapus!");
+                };
+            });
         });
 
-        // --- LEVEL 9: PWA SERVICE WORKER REGISTRATION [cite: 110] ---
+        // --- PWA SERVICE WORKER REGISTRATION ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js').catch(e => console.error(e));
